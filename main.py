@@ -35,15 +35,25 @@ cv2.createTrackbar('sayi2', 'image',1,255,nothing2)
 
 
 plt.ion()
-fig = plt.figure()
+
 
 # Capture frame-by-frame
 ret, frame = cap.read()
 # Our operations on the frame come here
-
 img = cv2.cvtColor(frame,0)
 imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-image = plt.imshow(imgray,interpolation='nearest',animated=True,label="blah")
+
+plt.subplot(121)
+a=plt.imshow(img,cmap = 'gray')
+plt.title('Original Image')
+plt.xticks([])
+plt.yticks([])
+
+plt.subplot(122)
+b=plt.imshow(imgray,cmap = 'gray')
+plt.title('Edge Image')
+plt.xticks([])
+plt.yticks([])
 
 while(True):
 
@@ -56,7 +66,8 @@ while(True):
 
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-    image.set_data(imgray)
+    a.set_data(img)
+    b.set_data(imgray)
     plt.draw()
     cv2.imshow('image',img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
