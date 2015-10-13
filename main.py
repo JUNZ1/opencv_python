@@ -44,20 +44,24 @@ ret, frame = cap.read()
 img = cv2.cvtColor(frame,0)
 imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-ax = fig.add_subplot(121)
+ax = fig.add_subplot(311)
 
 a=ax.imshow(img,cmap = 'gray')
 plt.title('Original Image')
 plt.xticks([])
 plt.yticks([])
 
-bx = fig.add_subplot(122)
+bx = fig.add_subplot(312)
 b=bx.imshow(imgray,cmap = 'gray')
 plt.title('Edge Image')
 plt.xticks([])
 plt.yticks([])
 
-
+hist_full = cv2.calcHist([imgray],[0],None,[256],[0,256])
+cx = fig.add_subplot(313)
+c=cx.plot(hist_full)
+plt.title('Histogram')
+plt.xlim([0,256])
 while(True):
 
 
@@ -68,10 +72,12 @@ while(True):
 
 
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
+    hist_full = cv2.calcHist([imgray],[0],None,[256],[0,256])
     a.set_data(imgray)
     b.set_data(img)
+    cx.plot(hist_full)
     plt.draw()
+    cx.cla()
     cv2.imshow('image',img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
