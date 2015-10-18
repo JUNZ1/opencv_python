@@ -75,7 +75,7 @@ while(True):
 
     cv2.imshow('image',img)
     try:
-        roi=cv2.imread('Crop.jpg')
+        roi=cv2.imread('Crop2.jpg')
         cv2.imshow('roi',roi)
     except cv2.error:
             pass
@@ -107,5 +107,5 @@ while(True):
     elif k==-1:  # gerekiyor
         continue
     elif k==1048691:  # 's' tusu kaydediyor
-        cv2.imwrite('Crop.jpg',crop)
+        cv2.imwrite('Crop2.jpg',crop)
         print 'goruntu kaydedildi'
