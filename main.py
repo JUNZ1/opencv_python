@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from time import *
 global rakam
 rakam=3
+
 def nothing(x):
     global rakam
     rakam=x
@@ -20,48 +21,50 @@ def nothing2(x):
     pass
 
 
-
-saban=cv2.imread('saban.jpg')
-
-
+saban=cv2.imread('pardus.jpg')
 saban = cv2.cvtColor(saban,0)
 saban = cv2.resize(saban, (640, 480))
-cap = cv2.VideoCapture(1)
+
+boxes = []
+global crop
+crop = cv2.resize(saban, (640, 480))
+
+def on_mouse(event, x, y, flags, params):
+    # global img
+
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+         print 'Start Mouse Position: '+str(x)+', '+str(y)
+         sbox = [x, y]
+         boxes.append(sbox)
+         # print count
+         # print sbox
+
+    elif event == cv2.EVENT_LBUTTONUP:
+        print 'End Mouse Position: '+str(x)+', '+str(y)
+        ebox = [x, y]
+        boxes.append(ebox)
+        print boxes
+        try:
+            global crop
+            crop = img[boxes[-2][1]:boxes[-1][1],boxes[-2][0]:boxes[-1][0]]
+
+        except cv2.error:
+            return
+
+
+
 
 
 cv2.namedWindow('image')
 cv2.createTrackbar('sayi1', 'image',1,255,nothing)
 cv2.createTrackbar('sayi2', 'image',1,255,nothing2)
+cv2.setMouseCallback('image', on_mouse, 0)
 
 
-plt.ion()
+cap = cv2.VideoCapture(1)
 
-fig = plt.figure()
 
-# Capture frame-by-frame
-ret, frame = cap.read()
-# Our operations on the frame come here
-img = cv2.cvtColor(frame,0)
-imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-ax = fig.add_subplot(311)
-
-a=ax.imshow(img,cmap = 'gray')
-plt.title('Original Image')
-plt.xticks([])
-plt.yticks([])
-
-bx = fig.add_subplot(312)
-b=bx.imshow(imgray,cmap = 'gray')
-plt.title('Edge Image')
-plt.xticks([])
-plt.yticks([])
-
-hist_full = cv2.calcHist([imgray],[0],None,[256],[0,256])
-cx = fig.add_subplot(313)
-c=cx.plot(hist_full)
-plt.title('Histogram')
-plt.xlim([0,256])
 while(True):
 
 
@@ -70,23 +73,18 @@ while(True):
     # Our operations on the frame come here
     img = cv2.cvtColor(frame,0)
 
+    cv2.imshow('image',img)
+    try:
+        cv2.imshow('crop',crop)
+    except cv2.error:
+            pass
 
-    imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    hist_full = cv2.calcHist([imgray],[0],None,[256],[0,256])
 
-    equ = cv2.equalizeHist(imgray)
-    histog1 = np.hstack((imgray,equ)) #stacking images side-by-side
-
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-    cl1 = clahe.apply(imgray)
-
-    histog2 = np.hstack((imgray,cl1)) #stacking images side-by-side
-    a.set_data(imgray)
-    b.set_data(img)
-    cx.plot(hist_full)
-    plt.draw()
-    cx.cla()
-    cv2.imshow('image',histog1)
-    cv2.imshow('histog2',histog2)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    k = cv2.waitKey(33)
+    if k==1048689:    # 'q' tusu cikmak icin
         break
+    elif k==-1:  # gerekiyor
+        continue
+    elif k==1048691:  # 's' tusu kaydediyor
+        cv2.imwrite('Crop.jpg',crop)
+        print 'goruntu kaydedildi'
