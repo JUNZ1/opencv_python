@@ -26,7 +26,7 @@ saban=cv2.imread('saban.jpg')
 
 saban = cv2.cvtColor(saban,0)
 saban = cv2.resize(saban, (640, 480))
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 
 cv2.namedWindow('image')
@@ -73,11 +73,20 @@ while(True):
 
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     hist_full = cv2.calcHist([imgray],[0],None,[256],[0,256])
+
+    equ = cv2.equalizeHist(imgray)
+    histog1 = np.hstack((imgray,equ)) #stacking images side-by-side
+
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    cl1 = clahe.apply(imgray)
+
+    histog2 = np.hstack((imgray,cl1)) #stacking images side-by-side
     a.set_data(imgray)
     b.set_data(img)
     cx.plot(hist_full)
     plt.draw()
     cx.cla()
-    cv2.imshow('image',img)
+    cv2.imshow('image',histog1)
+    cv2.imshow('histog2',histog2)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
