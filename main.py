@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 from time import *
+
 global rakam
 rakam=3
 
@@ -67,7 +68,6 @@ cap = cv2.VideoCapture(1)
 
 while(True):
 
-
     # Capture frame-by-frame
     ret, frame = cap.read()
     # Our operations on the frame come here
@@ -75,10 +75,31 @@ while(True):
 
     cv2.imshow('image',img)
     try:
-        cv2.imshow('crop',crop)
+        roi=cv2.imread('Crop.jpg')
+        cv2.imshow('roi',roi)
     except cv2.error:
             pass
 
+
+    hsv_roi = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
+
+    hsv_img = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+
+    roi_hist = cv2.calcHist([hsv_roi],[0, 1], None, [180, 256], [0, 180, 0, 256] )
+
+    cv2.normalize(roi_hist,roi_hist,0,255,cv2.NORM_MINMAX) #roi_hist normalize ediliyor
+
+    dst = cv2.calcBackProject([hsv_img],[0,1],roi_hist,[0,180,0,256],1)
+
+    disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+    cv2.filter2D(dst,-1,disc,dst)
+
+
+    cv2.imshow('deneme',dst)
+
+    cv2.threshold(dst,rakam,255,cv2.THRESH_BINARY,dst)
+
+    cv2.imshow('deneme',dst)
 
     k = cv2.waitKey(33)
     if k==1048689:    # 'q' tusu cikmak icin
