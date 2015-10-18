@@ -68,39 +68,34 @@ cap = cv2.VideoCapture(1)
 
 while(True):
 
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    # Our operations on the frame come here
-    img = cv2.cvtColor(frame,0)
-
-    cv2.imshow('image',img)
     try:
-        roi=cv2.imread('Crop2.jpg')
-        cv2.imshow('roi',roi)
+        template=cv2.imread('Crop2.jpg')
+        cv2.imshow('template',template)
+        [z, w, h] = template.shape[::-1]
+        print h,z,w
     except cv2.error:
             pass
 
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    # Our operations on the frame come here
+    img = cv2.cvtColor(frame,1)
+    yak1=img.copy()
+    #zeros = np.zeros(img.shape, dtype=np.uint8)
 
-    hsv_roi = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
-
-    hsv_img = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-
-    roi_hist = cv2.calcHist([hsv_roi],[0, 1], None, [180, 256], [0, 180, 0, 256] )
-
-    cv2.normalize(roi_hist,roi_hist,0,255,cv2.NORM_MINMAX) #roi_hist normalize ediliyor
-
-    dst = cv2.calcBackProject([hsv_img],[0,1],roi_hist,[0,180,0,256],1)
-
-    disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
-    cv2.filter2D(dst,-1,disc,dst)
+    #Yaklasim 1
+    res1 = cv2.matchTemplate(img,template,cv2.TM_CCOEFF)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res1)
+    top_left = max_loc
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv2.rectangle(yak1,top_left, bottom_right, 255, 2)
 
 
-    cv2.imshow('deneme',dst)
+    cv2.imshow('image',img)
+    cv2.imshow('yak1',yak1)
 
-    cv2.threshold(dst,rakam,255,cv2.THRESH_BINARY,dst)
-
-    cv2.imshow('deneme',dst)
-
+    cv2.imshow('sonuc',res1)
+    print res1
     k = cv2.waitKey(33)
     if k==1048689:    # 'q' tusu cikmak icin
         break
