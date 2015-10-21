@@ -98,8 +98,9 @@ while(True):
             print 'Size==',lines.shape
             print lines,'\n\n\n\n\n'
 
-            print 'Size2==',lines[0].shape
-            print lines[0],'\n\n\n\n\n'
+            print 'Size2==',lines[0,:,:].shape
+            print lines[0,:,:],'\n\n\n\n\n'
+
             a = np.cos(theta)
             b = np.sin(theta)
             x0 = a*rho
