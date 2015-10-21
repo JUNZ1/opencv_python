@@ -63,7 +63,7 @@ cv2.createTrackbar('sayi2', 'image',1,255,nothing2)
 cv2.setMouseCallback('image', on_mouse, 0)
 
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 while(True):
@@ -72,7 +72,7 @@ while(True):
         template=cv2.imread('Crop2.jpg')
         cv2.imshow('template',template)
         [z, w, h] = template.shape[::-1]
-        print h,z,w
+        #print h,z,w
     except cv2.error:
             pass
 
@@ -81,84 +81,43 @@ while(True):
     # Our operations on the frame come here
     img = cv2.cvtColor(frame,1)
 
-    yak1=img.copy()
-    yak2=img.copy()
-    yak3=img.copy()
-    yak4=img.copy()
-    yak5=img.copy()
-    yak6=img.copy()
 
 
-    #zeros = np.zeros(img.shape, dtype=np.uint8)
-
-    #Yaklasim 1
-    res1 = cv2.matchTemplate(img,template,cv2.TM_CCOEFF)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res1)
-    top_left = max_loc
-    bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(yak1,top_left, bottom_right, 255, 2)
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray,0,150,apertureSize = 3)
 
 
-    #Yaklasim 2
-    res2 = cv2.matchTemplate(img,template,cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res2)
-    top_left = max_loc
-    bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(yak2,top_left, bottom_right, 255, 2)
 
-    #Yaklasim 3
-    res3 = cv2.matchTemplate(img,template,cv2.TM_CCORR)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res3)
-    top_left = max_loc
-    bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(yak3,top_left, bottom_right, 255, 2)
-
-    #Yaklasim 4
-    res4 = cv2.matchTemplate(img,template,cv2.TM_CCORR_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res4)
-    top_left = max_loc
-    bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(yak4,top_left, bottom_right, 255, 2)
+    lines = cv2.HoughLines(edges,1,np.pi/180,200)
 
 
-    #Yaklasim 5
-    res5 = cv2.matchTemplate(img,template,cv2.TM_SQDIFF)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res5)
-    top_left = min_loc
-    bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(yak5,top_left, bottom_right, 255, 2)
 
+    try:
+        for rho,theta in lines[0]:
+            #print '1==',rho,'2==',theta
+            print 'Size==',lines.shape
+            print lines,'\n\n\n\n\n'
 
-    #Yaklasim 6
-    res6 = cv2.matchTemplate(img,template,cv2.TM_SQDIFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res6)
-    top_left = min_loc
-    bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(yak6,top_left, bottom_right, 255, 2)
+            print 'Size2==',lines[0].shape
+            print lines[0],'\n\n\n\n\n'
+            a = np.cos(theta)
+            b = np.sin(theta)
+            x0 = a*rho
+            y0 = b*rho
+            x1 = int(x0 + 1000*(-b))
+            y1 = int(y0 + 1000*(a))
+            x2 = int(x0 - 1000*(-b))
+            y2 = int(y0 - 1000*(a))
 
+            cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
 
+    except TypeError:
+            pass
 
     cv2.imshow('image',img)
 
-    cv2.imshow('yak1',yak1)
-    cv2.imshow('sonuc1',res1)
+    cv2.imshow('edge',edges)
 
-    cv2.imshow('yak2',yak2)
-    cv2.imshow('sonuc2',res2)
-
-    cv2.imshow('yak3',yak3)
-    cv2.imshow('sonuc3',res3)
-
-    cv2.imshow('yak4',yak4)
-    cv2.imshow('sonuc4',res4)
-
-    cv2.imshow('yak5',yak5)
-    cv2.imshow('sonuc5',res5)
-
-    cv2.imshow('yak6',yak6)
-    cv2.imshow('sonuc6',res6)
-
-    #print res1
     k = cv2.waitKey(33)
     if k==1048689:    # 'q' tusu cikmak icin
         break
