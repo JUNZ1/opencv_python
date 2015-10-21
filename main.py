@@ -22,13 +22,13 @@ def nothing2(x):
     pass
 
 
-saban=cv2.imread('pardus.jpg')
-saban = cv2.cvtColor(saban,0)
-saban = cv2.resize(saban, (640, 480))
+pardus=cv2.imread('pardus.jpg')
+pardus = cv2.cvtColor(pardus,0)
+pardus = cv2.resize(pardus, (640, 480))
 
 boxes = []
 global crop
-crop = cv2.resize(saban, (640, 480))
+crop = cv2.resize(pardus, (640, 480))
 
 def on_mouse(event, x, y, flags, params):
     # global img
@@ -80,7 +80,15 @@ while(True):
     ret, frame = cap.read()
     # Our operations on the frame come here
     img = cv2.cvtColor(frame,1)
+
     yak1=img.copy()
+    yak2=img.copy()
+    yak3=img.copy()
+    yak4=img.copy()
+    yak5=img.copy()
+    yak6=img.copy()
+
+
     #zeros = np.zeros(img.shape, dtype=np.uint8)
 
     #Yaklasim 1
@@ -91,11 +99,66 @@ while(True):
     cv2.rectangle(yak1,top_left, bottom_right, 255, 2)
 
 
-    cv2.imshow('image',img)
-    cv2.imshow('yak1',yak1)
+    #Yaklasim 2
+    res2 = cv2.matchTemplate(img,template,cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res2)
+    top_left = max_loc
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv2.rectangle(yak2,top_left, bottom_right, 255, 2)
 
-    cv2.imshow('sonuc',res1)
-    print res1
+    #Yaklasim 3
+    res3 = cv2.matchTemplate(img,template,cv2.TM_CCORR)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res3)
+    top_left = max_loc
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv2.rectangle(yak3,top_left, bottom_right, 255, 2)
+
+    #Yaklasim 4
+    res4 = cv2.matchTemplate(img,template,cv2.TM_CCORR_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res4)
+    top_left = max_loc
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv2.rectangle(yak4,top_left, bottom_right, 255, 2)
+
+
+    #Yaklasim 5
+    res5 = cv2.matchTemplate(img,template,cv2.TM_SQDIFF)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res5)
+    top_left = min_loc
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv2.rectangle(yak5,top_left, bottom_right, 255, 2)
+
+
+    #Yaklasim 6
+    res6 = cv2.matchTemplate(img,template,cv2.TM_SQDIFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res6)
+    top_left = min_loc
+    bottom_right = (top_left[0] + w, top_left[1] + h)
+    cv2.rectangle(yak6,top_left, bottom_right, 255, 2)
+
+
+
+    cv2.imshow('image',img)
+
+    cv2.imshow('yak1',yak1)
+    cv2.imshow('sonuc1',res1)
+
+    cv2.imshow('yak2',yak2)
+    cv2.imshow('sonuc2',res2)
+
+    cv2.imshow('yak3',yak3)
+    cv2.imshow('sonuc3',res3)
+
+    cv2.imshow('yak4',yak4)
+    cv2.imshow('sonuc4',res4)
+
+    cv2.imshow('yak5',yak5)
+    cv2.imshow('sonuc5',res5)
+
+    cv2.imshow('yak6',yak6)
+    cv2.imshow('sonuc6',res6)
+
+    #print res1
     k = cv2.waitKey(33)
     if k==1048689:    # 'q' tusu cikmak icin
         break
