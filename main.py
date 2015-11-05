@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from time import *
 
 global rakam
-rakam=3
+rakam=20
 
 def nothing(x):
     global rakam
@@ -58,63 +58,39 @@ def on_mouse(event, x, y, flags, params):
 
 
 cv2.namedWindow('image')
-cv2.createTrackbar('sayi1', 'image',1,255,nothing)
+cv2.createTrackbar('sayi1', 'image',30,255,nothing)
 cv2.createTrackbar('sayi2', 'image',1,255,nothing2)
 cv2.setMouseCallback('image', on_mouse, 0)
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 
 while(True):
-
-    try:
-        template=cv2.imread('Crop2.jpg')
-        cv2.imshow('template',template)
-        [z, w, h] = template.shape[::-1]
-        #print h,z,w
-    except cv2.error:
-            pass
-
     # Capture frame-by-frame
     ret, frame = cap.read()
     # Our operations on the frame come here
     img = cv2.cvtColor(frame,1)
-
-
+    img = cv2.medianBlur(img,5)
 
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray,0,150,apertureSize = 3)
 
 
 
-    lines = cv2.HoughLines(edges,1,np.pi/180,200)
-
-
+    circles = cv2.HoughCircles(edges,cv2.cv.CV_HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=0,maxRadius=rakam)
 
     try:
-        for rho,theta in lines[0]:
-            #print '1==',rho,'2==',theta
-            print 'Size==',lines.shape
-            print lines,'\n\n\n\n\n'
+        circles = np.uint16(np.around(circles))
 
-            print 'Size2==',lines[0,:,:].shape
-            print lines[0,:,:],'\n\n\n\n\n'
+        for i in circles[0,:]:
+            # draw the outer circle
+            cv2.circle(img,(i[0],i[1]),i[2],(0,255,0),2)
+            # draw the center of the circle
+            cv2.circle(img,(i[0],i[1]),2,(0,0,255),3)
 
-            a = np.cos(theta)
-            b = np.sin(theta)
-            x0 = a*rho
-            y0 = b*rho
-            x1 = int(x0 + 1000*(-b))
-            y1 = int(y0 + 1000*(a))
-            x2 = int(x0 - 1000*(-b))
-            y2 = int(y0 - 1000*(a))
-
-            cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
-
-    except TypeError:
-            pass
-
+    except AttributeError:
+        continue
     cv2.imshow('image',img)
 
     cv2.imshow('edge',edges)
